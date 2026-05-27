@@ -296,7 +296,7 @@ function checkFinalWord() {
     loseLife();
     document.getElementById('cipherDisplay').innerHTML = '❌ Неправильно. Спробуй ще раз!';
     setTimeout(() => {
-      document.getElementById('cipherDisplay').innerHTML = 'Введи слово "МАТЕРИКИ" або "МАТЕРИК"';
+      document.getElementById('cipherDisplay').innerHTML = 'Введи слово ';
     }, 1500);
     if (wrongAttempts >= MAX_WRONG_ATTEMPTS) {
       addXP(10);
