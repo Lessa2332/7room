@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
-    /* Стилі залишаються без змін (такі самі, як у вашому коді) */
+    /* ... (всі стилі ті самі, що в твоєму коді) ... */
     :root {
       --blue: #1a56ff;
       --dark: #0a1a6e;
@@ -102,12 +102,7 @@
     .pack-check { text-align:center; font-size:13px; font-weight:800; margin-top:8px; }
     .cipher-display { font-size:32px; font-weight:900; letter-spacing:6px; text-align:center; background:rgba(0,0,0,.25); border-radius:16px; padding:14px; margin-bottom:14px; }
     .cipher-hint { font-size:13px; color:var(--gold); text-align:center; margin-bottom:10px; }
-    .cipher-keys { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
-    .cipher-key { width:45px; height:45px; background:#0033bb; border:3px solid rgba(255,255,255,.6); border-radius:12px; color:white; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 0 #001a88; }
-    .cipher-key:active { transform:translateY(3px); box-shadow:0 1px 0 #001a88; }
-    .cipher-key.used { opacity:.35; pointer-events:none; }
-    .cipher-key.correct { background:var(--green); color:#003300; }
-    .cipher-lives { text-align:center; font-size:22px; margin-bottom:8px; }
+    .name-input { width:100%; padding:15px 20px; font-family:var(--font); font-size:18px; font-weight:700; border:4px solid var(--white); border-radius:25px; background:#0044cc; color:white; text-align:center; outline:none; margin-bottom:15px; }
     .badge { background:linear-gradient(135deg,#0033bb 0%,#000d66 100%); border:5px solid var(--gold); border-radius:26px; padding:20px; margin-bottom:16px; }
     .badge-name { font-size:22px; font-weight:900; margin-bottom:10px; }
     .skill-box { background:rgba(255,255,255,.1); padding:12px; border-left:5px solid var(--green); }
@@ -173,13 +168,15 @@
     <button class="btn btn-gold" id="packCheckBtn" onclick="window.checkPack()" style="display:none;">Перевірити 🧐</button>
   </div>
   
+  <!-- НОВИЙ КРОК 5: ВВЕДЕННЯ СЛОВА -->
   <div class="screen" id="s5">
     <h2>🔐 КРОК 5: СЕКРЕТНЕ СЛОВО</h2>
-    <div class="desc">Вгадай слово, що об'єднує всі великі ділянки суходолу.</div>
+    <div class="desc">Вгадай слово, що об'єднує всі великі ділянки суходолу. Введи його нижче!</div>
     <div class="cipher-lives" id="cipherLives">❤️❤️❤️</div>
-    <div class="cipher-display" id="cipherDisplay"></div>
-    <div class="cipher-hint" id="cipherHint">💡 Підказка: їх шість (або сім, якщо рахувати частини світу)</div>
-    <div class="cipher-keys" id="cipherKeys"></div>
+    <div class="cipher-hint" id="cipherHint">💡 Підказка: їх шість: Євразія, Африка, Пн. Америка, Пд. Америка, Австралія, Антарктида</div>
+    <div class="cipher-display" style="font-size: 24px; letter-spacing: normal;" id="cipherDisplay">Введи слово "МАТЕРИКИ"</div>
+    <input type="text" id="finalWordInput" class="name-input" placeholder="Напиши тут слово" style="width:100%; margin-bottom:15px;">
+    <button class="btn btn-gold" id="checkWordBtn" onclick="checkFinalWord()">Перевірити слово 🔍</button>
   </div>
   
   <div class="screen" id="sFinal">
@@ -278,28 +275,47 @@ function placeChip(zone) { if(!dragChip) return; let idx = dragChip.dataset.idx;
 window.checkPack = function() { let correct = 0; PACK_ITEMS.forEach((item,i)=>{ if(packPlaced[i] === item.zone) correct++; }); let fb = document.getElementById('packCheck'); if(correct === PACK_ITEMS.length){ fb.innerHTML = '🎉 Чудово! Всі острови розподілено правильно!'; fb.style.color = 'var(--green)'; addXP(25); window.flash('green'); setTimeout(()=>{ goTo('s5',4); initCipher(); },1000); } else { fb.innerHTML = `⚠️ ${correct}/${PACK_ITEMS.length} правильно. Спробуйте ще раз!`; fb.style.color = 'var(--pink)'; loseLife(); setTimeout(resetPack, 1200); } };
 function resetPack() { packPlaced = {}; document.getElementById('continentalItems').innerHTML = ''; document.getElementById('volcanicItems').innerHTML = ''; document.getElementById('coralItems').innerHTML = ''; document.getElementById('packCheck').textContent = ''; document.getElementById('packCheckBtn').style.display = 'none'; document.querySelectorAll('#packShelf .pack-chip').forEach(c=>{ c.style.display = ''; c.style.opacity = '1'; }); }
 
-// ========== КРОК 5: ШИФР (слово МАТЕРИКИ) ==========
-const CIPHER_WORD = "МАТЕРИКИ";
-const CIPHER_HINT = "Їх шість: Євразія, Африка, Пн. Америка, Пд. Америка, Австралія, Антарктида";
-let cGuessed = [], cWrong = 0, C_MAX_WRONG = 3;
-function initCipher() { cGuessed = []; cWrong = 0; renderCipher(); buildKeys(); }
-function renderCipher() { let disp = CIPHER_WORD.split('').map(l=> cGuessed.includes(l) ? l : '_').join(' '); document.getElementById('cipherDisplay').textContent = disp; let done = CIPHER_WORD.split('').filter(l=> cGuessed.includes(l)).length; document.getElementById('cipherProg').innerHTML = `Відкрито: ${done}/${CIPHER_WORD.length}`; let hearts = Array(C_MAX_WRONG).fill(0).map((_,i)=> i < (C_MAX_WRONG - cWrong) ? '❤️':'🖤').join(''); document.getElementById('cipherLives').innerHTML = hearts; document.getElementById('cipherHint').innerHTML = '💡 ' + CIPHER_HINT; }
-function buildKeys() { let letters = "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"; let container = document.getElementById('cipherKeys'); container.innerHTML = ''; for(let l of letters){ let btn = document.createElement('button'); btn.className = 'cipher-key'; btn.textContent = l; btn.onclick = ()=> guessLetter(l, btn); container.appendChild(btn); } }
-function guessLetter(letter, btn) { if(cGuessed.includes(letter)) return; cGuessed.push(letter); btn.classList.add('used'); if(CIPHER_WORD.includes(letter)){ btn.classList.add('correct'); addXP(5); window.flash('green'); if(CIPHER_WORD.split('').every(l=> cGuessed.includes(l))){ addXP(20); setTimeout(finishGame, 700); return; } } else { btn.classList.add('wrong'); cWrong++; loseLife(); if(cWrong >= C_MAX_WRONG){ cGuessed.push(...CIPHER_WORD.split('')); renderCipher(); setTimeout(finishGame, 1000); return; } } renderCipher(); }
+// ========== НОВИЙ КРОК 5: ВВЕДЕННЯ СЛОВА ==========
+let wrongAttempts = 0;
+const MAX_WRONG_ATTEMPTS = 3;
+function initCipher() {
+  wrongAttempts = 0;
+  document.getElementById('cipherLives').innerHTML = '❤️❤️❤️';
+  document.getElementById('cipherHint').innerHTML = '💡 Підказка: великі ділянки суходолу, їх шість';
+  document.getElementById('finalWordInput').value = '';
+  document.getElementById('cipherDisplay').innerHTML = 'Введи слово "МАТЕРИКИ" або "МАТЕРИК"';
+}
+function checkFinalWord() {
+  let userWord = document.getElementById('finalWordInput').value.trim().toUpperCase();
+  if (userWord === "МАТЕРИКИ" || userWord === "МАТЕРИК") {
+    addXP(20);
+    window.flash('green');
+    setTimeout(finishGame, 700);
+  } else {
+    wrongAttempts++;
+    let hearts = Array(MAX_WRONG_ATTEMPTS).fill(0).map((_,i)=> i < (MAX_WRONG_ATTEMPTS - wrongAttempts) ? '❤️':'🖤').join('');
+    document.getElementById('cipherLives').innerHTML = hearts;
+    loseLife();
+    document.getElementById('cipherDisplay').innerHTML = '❌ Неправильно. Спробуй ще раз!';
+    setTimeout(() => {
+      document.getElementById('cipherDisplay').innerHTML = 'Введи слово "МАТЕРИКИ" або "МАТЕРИК"';
+    }, 1500);
+    if (wrongAttempts >= MAX_WRONG_ATTEMPTS) {
+      addXP(10);
+      setTimeout(finishGame, 1000);
+    }
+  }
+}
 
 // ========== ФІНАЛ (з відправкою в Google Таблицю) ==========
-let dataSent = false; // запобігаємо повторній відправці
+let dataSent = false;
 function finishGame() {
-  // Отримуємо ім'я з різних можливих ключів localStorage
   let studentName = localStorage.getItem('pysanka_student_name') || 
                     localStorage.getItem('geo_student') || 
                     'Географ-початківець';
-  
-  // Отримуємо суперсилу та бонус (якщо є від сканера)
   let studentSkill = localStorage.getItem('pysanka_student_skill') || '🌐 Картографічна грамотність';
   let studentBonus = localStorage.getItem('pysanka_student_bonus') || 'Відрізняє материки від частин світу, знає походження островів';
   
-  // Відображаємо на бейджі
   document.getElementById('bName').textContent = studentName;
   document.getElementById('bSkill').textContent = studentSkill;
   document.getElementById('bBonus').textContent = studentBonus;
@@ -313,19 +329,18 @@ function finishGame() {
     confetti({ particleCount:150, spread:70, origin:{y:0.6} });
   }
   
-  // Відправляємо дані до Google Таблиці, якщо ще не надсилали
   if (!dataSent) {
     dataSent = true;
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUQDH4R8hyxjzW_tySEyj4vbCkd4nq_6NPChEq-9onPvWgatk5ryENhv75N3h9bgn9aA/exec";
     fetch(WEB_APP_URL, {
       method: 'POST',
-      mode: 'no-cors', // через різні джерела, але дані все одно дійдуть
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: studentName,
         skill: studentSkill,
         bonus: studentBonus,
-        key: 'Pysanka5ClassKey2026'  // секретний ключ для безпеки
+        key: 'Pysanka5ClassKey2026'
       })
     }).catch(err => console.log('Помилка відправки в таблицю:', err));
   }
@@ -352,7 +367,6 @@ window.saveScreenshot = function() {
   }); 
 };
 
-// Запит імені при старті, якщо немає збереженого
 window.addEventListener('load', ()=>{
   let saved = localStorage.getItem('geo_student') || localStorage.getItem('pysanka_student_name');
   if(!saved) { 
