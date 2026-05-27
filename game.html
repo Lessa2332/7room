@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
-    /* ... (всі стилі ті самі, що в твоєму коді) ... */
     :root {
       --blue: #1a56ff;
       --dark: #0a1a6e;
@@ -130,7 +129,7 @@
   
   <div class="screen active" id="s1">
     <h2>🌐 КРОК 1: ЗЕМЛЯ У ЦИФРАХ</h2>
-    <div class="desc">Перевір свої знання про материки, океани та співвідношення суходолу й води!</div>
+    <div class="desc">Перевір твоє знання про материки, океани та співвідношення суходолу й води!</div>
     <div class="quiz-counter" id="qCounter">1/5</div>
     <div class="quiz-timer-rail"><div class="quiz-timer-bar" id="qTimerBar"></div></div>
     <div class="quiz-q" id="qText"></div>
@@ -168,13 +167,12 @@
     <button class="btn btn-gold" id="packCheckBtn" onclick="window.checkPack()" style="display:none;">Перевірити 🧐</button>
   </div>
   
-  <!-- НОВИЙ КРОК 5: ВВЕДЕННЯ СЛОВА -->
   <div class="screen" id="s5">
     <h2>🔐 КРОК 5: СЕКРЕТНЕ СЛОВО</h2>
     <div class="desc">Вгадай слово, що об'єднує всі великі ділянки суходолу. Введи його нижче!</div>
     <div class="cipher-lives" id="cipherLives">❤️❤️❤️</div>
     <div class="cipher-hint" id="cipherHint">💡 Підказка: їх шість: Євразія, Африка, Пн. Америка, Пд. Америка, Австралія, Антарктида</div>
-    <div class="cipher-display" style="font-size: 24px; letter-spacing: normal;" id="cipherDisplay">Введи слово "МАТЕРИКИ"</div>
+    <div class="cipher-display" style="font-size: 24px; letter-spacing: normal;" id="cipherDisplay">Введи слово "МАТЕРИКИ" або "МАТЕРИК"</div>
     <input type="text" id="finalWordInput" class="name-input" placeholder="Напиши тут слово" style="width:100%; margin-bottom:15px;">
     <button class="btn btn-gold" id="checkWordBtn" onclick="checkFinalWord()">Перевірити слово 🔍</button>
   </div>
@@ -275,7 +273,7 @@ function placeChip(zone) { if(!dragChip) return; let idx = dragChip.dataset.idx;
 window.checkPack = function() { let correct = 0; PACK_ITEMS.forEach((item,i)=>{ if(packPlaced[i] === item.zone) correct++; }); let fb = document.getElementById('packCheck'); if(correct === PACK_ITEMS.length){ fb.innerHTML = '🎉 Чудово! Всі острови розподілено правильно!'; fb.style.color = 'var(--green)'; addXP(25); window.flash('green'); setTimeout(()=>{ goTo('s5',4); initCipher(); },1000); } else { fb.innerHTML = `⚠️ ${correct}/${PACK_ITEMS.length} правильно. Спробуйте ще раз!`; fb.style.color = 'var(--pink)'; loseLife(); setTimeout(resetPack, 1200); } };
 function resetPack() { packPlaced = {}; document.getElementById('continentalItems').innerHTML = ''; document.getElementById('volcanicItems').innerHTML = ''; document.getElementById('coralItems').innerHTML = ''; document.getElementById('packCheck').textContent = ''; document.getElementById('packCheckBtn').style.display = 'none'; document.querySelectorAll('#packShelf .pack-chip').forEach(c=>{ c.style.display = ''; c.style.opacity = '1'; }); }
 
-// ========== НОВИЙ КРОК 5: ВВЕДЕННЯ СЛОВА ==========
+// ========== КРОК 5: ВВЕДЕННЯ СЛОВА ==========
 let wrongAttempts = 0;
 const MAX_WRONG_ATTEMPTS = 3;
 function initCipher() {
@@ -307,14 +305,14 @@ function checkFinalWord() {
   }
 }
 
-// ========== ФІНАЛ (виправлена відправка в Google Таблицю) ==========
+// ========== ФІНАЛ ТА НАДІЙНА ВІДПРАВКА В ТАБЛИЦЮ ==========
 let dataSent = false;
 function finishGame() {
-  let studentName = localStorage.getItem('pysanka_student_name') || 
-                    localStorage.getItem('geo_student') || 
+  let studentName = localStorage.getItem('geo_student') || 
+                    localStorage.getItem('pysanka_student_name') || 
                     'Географ-початківець';
-  let studentSkill = localStorage.getItem('pysanka_student_skill') || '🌐 Картографічна грамотність';
-  let studentBonus = localStorage.getItem('pysanka_student_bonus') || 'Відрізняє материки від частин світу, знає походження островів';
+  let studentSkill = '🌐 Картографічна грамотність';
+  let studentBonus = 'Відрізняє материки від частин світу, знає походження островів';
   
   document.getElementById('bName').textContent = studentName;
   document.getElementById('bSkill').textContent = studentSkill;
@@ -331,11 +329,13 @@ function finishGame() {
   
   if (!dataSent) {
     dataSent = true;
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUQDH4R8hyxjzW_tySEyj4vbCkd4nq_6NPChEq-9onPvWgatk5ryENhv75N3h9bgn9aA/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzMb7dUIvQIKCrYO0p2xRoNEmu8aC0ZffmcDAq8JHfxXVwp9Vjq_6_Ezlvog0ipzWH_FQ/exec";
     
-    // Основний запит без no-cors – отримуємо відповідь
+    // Прямий запит без блокування CORS
     fetch(WEB_APP_URL, {
       method: 'POST',
+      mode: 'no-cors',
+      cache: 'no-cache',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: studentName,
@@ -344,27 +344,11 @@ function finishGame() {
         key: 'Pysanka5ClassKey2026'
       })
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('✅ Google Apps Script відповів:', data);
-      if (data.status !== 'success') {
-        console.warn('Помилка таблиці:', data.message);
-      }
+    .then(() => {
+      console.log('✅ Результати гри надіслано до таблиці!');
     })
     .catch(err => {
-      console.error('❌ Помилка відправки (CORS або мережа):', err);
-      // Резервний no-cors запит (не побачимо відповідь, але надішлемо)
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: studentName,
-          skill: studentSkill,
-          bonus: studentBonus,
-          key: 'Pysanka5ClassKey2026'
-        })
-      }).catch(e => console.log('Навіть no-cors не спрацював:', e));
+      console.error('❌ Помилка відправки даних:', err);
     });
   }
 }
