@@ -3,645 +3,311 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Рюкзак у 5-й Клас | Квест-гра</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+  <title> Географія 7-Г клас | Материки та океани</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     :root {
-      --bg-blue: #0066ff;
-      --bg-dark-blue: #0044cc;
-      --gold-yellow: #FFE600;
-      --neon-green: #39FF14;
-      --neon-pink: #ff3366;
-      --text-white: #ffffff;
-      --font-main: 'Montserrat', sans-serif;
-      --transition: all 0.3s ease;
+      --blue: #1a56ff;
+      --dark: #0a1a6e;
+      --gold: #FFE600;
+      --green: #39FF14;
+      --pink: #ff3366;
+      --white: #ffffff;
+      --font: 'Nunito', sans-serif;
     }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
     body {
-      font-family: var(--font-main);
-      background: radial-gradient(circle at 50% 50%, var(--bg-blue) 0%, var(--bg-dark-blue) 100%);
-      color: var(--text-white);
-      min-height: 100vh;
+      font-family: var(--font);
+      background: radial-gradient(ellipse at 60% 10%, #1a56ff 0%, #0a1a6e 70%);
+      color: var(--white);
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 15px;
+      padding: 12px 12px 40px;
       overflow-x: hidden;
     }
-
-    /* Інтерфейс прогресу (XP BAR) */
-    .header-panel {
+    .hdr {
       width: 100%;
-      max-width: 450px;
-      background: rgba(0, 0, 68, 0.4);
-      padding: 15px;
-      border-radius: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      margin-bottom: 20px;
-      text-align: center;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    }
-
-    .xp-text {
-      font-weight: 900;
-      font-size: 16px;
-      color: var(--gold-yellow);
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-
-    .xp-container {
-      width: 100%;
-      height: 20px;
-      background: #002266;
-      border-radius: 10px;
-      border: 2px solid white;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .xp-bar {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold-yellow), var(--neon-green));
-      box-shadow: 0 0 10px var(--neon-green);
-      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Спливаючі бали +XP */
-    .xp-popup {
-      position: fixed;
-      top: 20%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 48px;
-      font-weight: 900;
-      color: var(--neon-green);
-      text-shadow: 0 0 20px var(--neon-green), 0 4px 0 #000;
-      z-index: 100;
-      animation: floatUp 1.2s ease-out forwards;
-      display: none;
-    }
-
-    @keyframes floatUp {
-      0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
-      20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -100px) scale(1); }
-    }
-
-    /* Ігрові Екрани-Контейнери */
-    .game-box {
-      background: #0055ff;
-      border: 6px solid var(--text-white);
-      border-radius: 35px;
-      padding: 25px 20px;
-      max-width: 450px;
-      width: 100%;
-      margin: auto 0;
-      box-shadow: 0 15px 0px rgba(0, 0, 68, 0.4);
-      text-align: center;
-      position: relative;
-    }
-
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    h2 {
-      font-weight: 900;
-      font-size: 22px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      color: var(--gold-yellow);
-      text-shadow: 0 3px 0 rgba(0,0,0,0.3);
-    }
-
-    .desc {
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.4;
-      margin-bottom: 20px;
-      opacity: 0.95;
-    }
-
-    /* ЕТАП 1: КВІЗ-ВАРІАНТИ */
-    .quiz-equation {
-      background: rgba(0,0,0,0.2);
-      padding: 15px;
-      border-radius: 20px;
-      font-size: 32px;
-      font-weight: 900;
-      margin-bottom: 20px;
-      border: 2px dashed rgba(255,255,255,0.3);
-    }
-
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .opt-btn {
-      background: #0044cc;
-      border: 3px solid white;
-      border-radius: 20px;
-      padding: 15px;
-      color: white;
-      font-family: var(--font-main);
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 5px 0 #002288;
-      text-align: left;
-    }
-
-    .opt-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 2px 0 #002288;
-    }
-
-    .opt-btn.correct {
-      background: var(--neon-green) !important;
-      color: #0044cc !important;
-      border-color: #fff !important;
-    }
-
-    .opt-btn.wrong {
-      background: var(--neon-pink) !important;
-    }
-
-    /* ЕТАП 2: ТАПАЛКА */
-    .tap-target {
-      width: 130px;
-      height: 130px;
-      background: radial-gradient(circle, #ffe600 0%, #ff9900 100%);
-      border: 5px solid white;
-      border-radius: 50%;
-      margin: 20px auto;
+      max-width: 500px;
+      background: rgba(0,0,50,.45);
+      backdrop-filter: blur(6px);
+      border: 2px solid rgba(255,255,255,.25);
+      border-radius: 18px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      cursor: pointer;
-      box-shadow: 0 0 25px var(--gold-yellow), 0 8px 0 #cc6600;
-      transition: transform 0.05s ease;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-
-    .tap-target:active {
-      transform: scale(0.92) translateY(4px);
-      box-shadow: 0 0 15px var(--gold-yellow), 0 2px 0 #cc6600;
-    }
-
-    .progress-mini-container {
+    .hdr-labels { flex:1; }
+    .hdr-top { display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--gold); margin-bottom:5px; }
+    .xp-rail { height:14px; background:#0a1060; border-radius:7px; border:2px solid rgba(255,255,255,.3); overflow:hidden; }
+    .xp-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--green)); border-radius:7px; transition:width .5s; width:0%; }
+    .lives { display:flex; gap:3px; font-size:20px; }
+    .xp-pop { position:fixed; top:18%; left:50%; transform:translate(-50%,-50%); font-size:44px; font-weight:900; color:var(--green); text-shadow:0 0 20px var(--green),0 3px 0 #000; z-index:200; display:none; pointer-events:none; }
+    @keyframes floatUp { 0%{opacity:0;transform:translate(-50%,0) scale(.5)} 20%{opacity:1;transform:translate(-50%,-18px) scale(1.2)} 100%{opacity:0;transform:translate(-50%,-90px) scale(1)} }
+    .card {
+      background: #1a4aff;
+      border: 5px solid var(--white);
+      border-radius: 32px;
+      padding: 22px 18px 24px;
+      max-width: 500px;
       width: 100%;
-      height: 16px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 8px;
-      border: 2px solid white;
-      overflow: hidden;
-      margin-top: 15px;
+      box-shadow: 0 14px 0 rgba(0,0,50,.45);
+      position: relative;
     }
-
-    .progress-mini-bar {
-      width: 0%;
-      height: 100%;
-      background: var(--neon-pink);
-      box-shadow: 0 0 8px var(--neon-pink);
-    }
-
-    /* ЕТАП 3: ТЕТРІС-РЮКЗАК (DRAG & DROP) */
-    .bag-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      max-width: 260px;
-      margin: 20px auto;
-      background: #0033aa;
-      padding: 12px;
-      border-radius: 20px;
-      border: 4px solid white;
-      box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
-    }
-
-    .grid-cell {
-      aspect-ratio: 1;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px dashed rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      transition: var(--transition);
-    }
-
-    .grid-cell.highlight {
-      background: rgba(57, 255, 20, 0.2);
-      border-color: var(--neon-green);
-    }
-
-    .items-shelf {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 25px;
-      min-height: 80px;
-    }
-
-    .drag-item {
-      padding: 12px 18px;
-      background: var(--gold-yellow);
-      color: #0044cc;
-      border: 3px solid white;
-      border-radius: 15px;
-      font-weight: 900;
-      font-size: 14px;
-      cursor: grab;
-      box-shadow: 0 4px 0 #cda600;
-      touch-action: none;
-    }
-
-    .drag-item:active {
-      cursor: grabbing;
-    }
-
-    .drag-item.placed {
-      display: none;
-    }
-
-    /* ФІНАЛЬНИЙ БЕЙДЖ СУПЕРСИЛИ */
-    .badge-card {
-      background: linear-gradient(135deg, #0044cc 0%, #001166 100%);
-      border: 5px solid var(--gold-yellow);
-      border-radius: 30px;
-      padding: 25px 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 30px rgba(255, 230, 0, 0.3);
-    }
-
-    .badge-title {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #aaa;
-      margin-bottom: 5px;
-    }
-
-    .student-name {
-      font-size: 26px;
-      font-weight: 900;
-      color: #fff;
-      margin-bottom: 15px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-    }
-
-    .skill-box {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 15px;
-      border-left: 5px solid var(--neon-green);
-      text-align: left;
-      margin-bottom: 15px;
-    }
-
-    .skill-title {
-      font-weight: 900;
-      font-size: 16px;
-      color: var(--gold-yellow);
-      margin-bottom: 4px;
-    }
-
-    .skill-desc {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--neon-green);
-    }
-
-    .promo-box {
-      background: dashed rgba(255, 230, 0, 0.2);
-      border: 2px dashed var(--gold-yellow);
-      padding: 12px;
-      border-radius: 15px;
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--gold-yellow);
-      letter-spacing: 1px;
-    }
-
-    .btn-action {
-      width: 100%;
-      padding: 16px;
-      background: var(--neon-green);
-      color: #0044cc;
-      border: 4px solid white;
-      border-radius: 25px;
-      font-family: var(--font-main);
-      font-size: 16px;
-      font-weight: 900;
-      text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: 0 6px 0 #2cc90f;
-    }
-
-    .btn-action:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #2cc90f;
-    }
-
-    .screenshot-hint {
-      font-size: 11px;
-      font-weight: 700;
-      color: #ddd;
-      margin-top: 10px;
-      line-height: 1.3;
-    }
+    .screen { display:none; }
+    .screen.active { display:block; }
+    h2 { font-weight:900; font-size:20px; text-transform:uppercase; color:var(--gold); text-shadow:0 3px 0 rgba(0,0,0,.3); margin-bottom:6px; }
+    .desc { font-size:13px; font-weight:700; line-height:1.5; margin-bottom:16px; opacity:.9; }
+    .stage-dots { display:flex; justify-content:center; gap:6px; margin-bottom:14px; }
+    .dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.2); border:2px solid rgba(255,255,255,.3); transition:.3s; }
+    .dot.done { background:var(--green); border-color:var(--green); box-shadow:0 0 8px var(--green); }
+    .dot.active { background:var(--gold); border-color:var(--gold); transform:scale(1.3); }
+    .btn { display:block; width:100%; padding:15px; background:var(--green); color:#0a3a00; border:4px solid var(--white); border-radius:22px; font-family:var(--font); font-size:15px; font-weight:900; text-transform:uppercase; cursor:pointer; box-shadow:0 6px 0 #28b20e; text-align:center; transition:transform .08s,box-shadow .08s; margin-top:14px; }
+    .btn:active { transform:translateY(4px); box-shadow:0 2px 0 #28b20e; }
+    .btn-gold { background:var(--gold); color:#1a1a00; box-shadow:0 6px 0 #cda500; }
+    /* QUIZ */
+    .quiz-q { background:rgba(0,0,0,.22); border-radius:18px; padding:14px 16px; font-size:20px; font-weight:900; margin-bottom:14px; border:2px dashed rgba(255,255,255,.25); text-align:center; }
+    .quiz-timer-rail { height:8px; background:rgba(0,0,0,.3); border-radius:4px; margin-bottom:14px; }
+    .quiz-timer-bar { height:100%; background:var(--green); transition:width .1s linear; }
+    .quiz-timer-bar.danger { background:var(--pink); }
+    .opts { display:flex; flex-direction:column; gap:10px; }
+    .opt { background:#0033bb; border:3px solid rgba(255,255,255,.6); border-radius:16px; padding:12px; font-weight:800; cursor:pointer; transition:transform .05s; }
+    .opt.correct { background:var(--green)!important; color:#003300!important; animation:pop .3s; }
+    .opt.wrong { background:var(--pink)!important; animation:shake .3s; }
+    @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.02)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    /* CATCH */
+    .catch-arena { position:relative; width:100%; height:280px; background:rgba(0,0,0,.25); border-radius:20px; border:3px solid rgba(255,255,255,.2); overflow:hidden; margin:10px 0; touch-action:none; }
+    .catch-basket { position:absolute; bottom:8px; width:70px; height:40px; background:var(--gold); border:3px solid var(--white); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; transform:translateX(-50%); transition:left .05s; box-shadow:0 4px 0 #cda500; }
+    .falling-item { position:absolute; font-size:26px; top:-40px; transform:translateX(-50%); cursor:pointer; filter:drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
+    .catch-stats { display:flex; justify-content:space-between; font-size:13px; font-weight:800; color:var(--gold); margin-bottom:4px; }
+    .catch-bar-rail { height:10px; background:rgba(0,0,0,.3); border-radius:5px; overflow:hidden; }
+    .catch-bar { height:100%; background:var(--green); width:0%; }
+    /* SORT */
+    .sort-item { background:var(--gold); color:#1a1a00; border:3px solid var(--white); border-radius:18px; padding:16px; font-weight:900; text-align:center; margin-bottom:14px; box-shadow:0 5px 0 #cda500; }
+    .sort-buttons { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .sort-btn { padding:15px; font-weight:900; border:4px solid var(--white); border-radius:20px; cursor:pointer; }
+    .sort-yes { background:#1a9900; color:white; box-shadow:0 5px 0 #0d5200; }
+    .sort-no { background:var(--pink); color:white; box-shadow:0 5px 0 #991133; }
+    .sort-counter { font-size:12px; font-weight:800; color:var(--gold); text-align:center; margin-bottom:8px; }
+    /* DRAG & DROP - 3 зони */
+    .pack-layout { display:flex; flex-wrap:wrap; gap:10px; margin:10px 0; justify-content:center; }
+    .pack-zone { flex:1; min-width:120px; border:3px dashed rgba(255,255,255,.35); border-radius:16px; padding:8px; background:rgba(0,0,0,.2); }
+    .pack-zone-label { font-size:11px; font-weight:900; color:var(--gold); text-align:center; margin-bottom:6px; }
+    .pack-zone.highlight { border-color:var(--green); background:rgba(57,255,20,.1); }
+    .pack-items-row { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; min-height:60px; }
+    .pack-chip { background:var(--gold); color:#1a1a00; border:2px solid var(--white); border-radius:12px; padding:6px 10px; font-size:12px; font-weight:900; cursor:grab; box-shadow:0 3px 0 #cda500; touch-action:none; }
+    .pack-check { text-align:center; font-size:13px; font-weight:800; margin-top:8px; }
+    /* CIPHER */
+    .cipher-display { font-size:32px; font-weight:900; letter-spacing:6px; text-align:center; background:rgba(0,0,0,.25); border-radius:16px; padding:14px; margin-bottom:14px; }
+    .cipher-hint { font-size:13px; color:var(--gold); text-align:center; margin-bottom:10px; }
+    .cipher-keys { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+    .cipher-key { width:45px; height:45px; background:#0033bb; border:3px solid rgba(255,255,255,.6); border-radius:12px; color:white; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 0 #001a88; }
+    .cipher-key:active { transform:translateY(3px); box-shadow:0 1px 0 #001a88; }
+    .cipher-key.used { opacity:.35; pointer-events:none; }
+    .cipher-key.correct { background:var(--green); color:#003300; }
+    .cipher-lives { text-align:center; font-size:22px; margin-bottom:8px; }
+    /* FINAL */
+    .badge { background:linear-gradient(135deg,#0033bb 0%,#000d66 100%); border:5px solid var(--gold); border-radius:26px; padding:20px; margin-bottom:16px; }
+    .badge-name { font-size:22px; font-weight:900; margin-bottom:10px; }
+    .skill-box { background:rgba(255,255,255,.1); padding:12px; border-left:5px solid var(--green); }
+    .promo { border:2px dashed var(--gold); padding:10px; text-align:center; font-weight:900; color:var(--gold); }
+    .result-flash { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:300; opacity:0; transition:opacity .2s; }
+    .result-flash.green { background:rgba(57,255,20,.18); }
+    .result-flash.red { background:rgba(255,51,102,.18); }
+    .result-flash.show { opacity:1; }
+    .fade-in { animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   </style>
 </head>
 <body>
-
-  <div class="header-panel">
-    <div class="xp-text">РІВЕНЬ ПРОГРЕСУ: <span id="xpCount">0</span>/100 XP</div>
-    <div class="xp-container">
-      <div class="xp-bar" id="xpBar"></div>
-    </div>
+<div class="result-flash" id="flash"></div>
+<div class="xp-pop" id="xpPop">+25 XP</div>
+<div class="hdr">
+  <div class="hdr-labels">
+    <div class="hdr-top"><span>🌍 XP: <span id="xpCount">0</span>/150</span><span id="stageLabel">Крок 1/5</span></div>
+    <div class="xp-rail"><div class="xp-fill" id="xpFill"></div></div>
   </div>
-
-  <div class="xp-popup" id="xpPopup">+30 XP</div>
-
-  <div class="game-box">
-    
-    <div class="screen active" id="screen1">
-      <h2>🔐 КРОК 1: ЗЛАМАЙ ШИФР</h2>
-      <div class="desc">Олеся Олександрівна закрила шафу з кібер-підручниками на емодзі-замок! Розгадай рівняння, щоб отримати ключ:</div>
-      
-      <div class="quiz-equation">🧠 + 📚 = ?</div>
-      
-      <div class="quiz-options">
-        <button class="opt-btn" onclick="handleQuiz(false, this)">💤 А) Сон на першому уроці</button>
-        <button class="opt-btn" onclick="handleQuiz(false, this)">🤯 Б) Нудна домашня робота</button>
-        <button class="opt-btn" onclick="handleQuiz(true, this)">🚀 В) Успішний 5-й Клас!</button>
-      </div>
-    </div>
-
-    <div class="screen" id="screen2">
-      <h2>⚡ КРОК 2: АНТИСТРЕС-ЗАРЯДКА</h2>
-      <div class="desc">Знайдено <b>Неонову Лінійку</b>! Але вона заряджена стресом від контрольних. Швидко ТАПАЙ по екрану, щоб очистити її!</div>
-      
-      <div class="tap-target" onclick="handleTap()">📏</div>
-      
-      <div style="font-size: 13px; font-weight: 700;">ЕНЕРГІЯ ОЧИЩЕННЯ:</div>
-      <div class="progress-mini-container">
-        <div class="progress-mini-bar" id="miniBar"></div>
-      </div>
-    </div>
-
-    <div class="screen" id="screen3">
-      <h2>🎒 КРОК 3: ТЕТРІС-СПАКОВКА</h2>
-      <div class="desc">Всі речі готові! Перетягни пальцем <b>Підручник</b> та <b>Лінійку</b> в рюкзак, щоб закрити замок!</div>
-      
-      <div class="bag-grid" id="bagGrid">
-        <div class="grid-cell" id="cell1"></div>
-        <div class="grid-cell" id="cell2"></div>
-        <div class="grid-cell" id="cell3"></div>
-      </div>
-
-      <div class="items-shelf">
-        <div class="drag-item" id="item1" draggable="true">📚 Підручник</div>
-        <div class="drag-item" id="item2" draggable="true">📏 Лінійка</div>
-      </div>
-    </div>
-
-    <div class="screen" id="screenFinal">
-      <h2>🏆 КВЕСТ ПРОЙДЕНО!</h2>
-      <div class="desc" style="color:var(--neon-green)">Ти повністю готовий(а) до нових пригод!</div>
-      
-      <div class="badge-card">
-        <div class="badge-title">Офіційний П'ятикласник</div>
-        <div class="student-name" id="badgeName">Учень</div>
-        
-        <div class="skill-box">
-          <div class="skill-title" id="badgeSkill">Суперсила</div>
-          <div class="skill-desc" id="badgeBonus">Бонус</div>
-        </div>
-        
-        <div class="badge-title" style="color: var(--gold-yellow); margin-bottom: 5px;">Секретний промокод:</div>
-        <div class="promo-box">SUPER5CLASS</div>
-      </div>
-
-      <button class="btn-action" onclick="alert('Скріншот готовий! Збережи його до 1 вересня! 📸')">Зробити Скріншот 📸</button>
-      <div class="screenshot-hint">Зроби скріншот цього екрана, надішли вчителю або покажи 1 вересня, щоб отримати свій перший реальний бонус!</div>
-    </div>
-
+  <div class="lives" id="livesEl">❤️❤️❤️</div>
+</div>
+<div class="card">
+  <div class="stage-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div><div class="dot" id="dot3"></div><div class="dot" id="dot4"></div></div>
+  
+  <!-- Крок 1: Вікторина "Материки та океани" -->
+  <div class="screen active" id="s1">
+    <h2>🌐 КРОК 1: ЗЕМЛЯ У ЦИФРАХ</h2>
+    <div class="desc">Перевір свої знання про материки, океани та співвідношення суходолу й води!</div>
+    <div class="quiz-counter" id="qCounter">1/5</div>
+    <div class="quiz-timer-rail"><div class="quiz-timer-bar" id="qTimerBar"></div></div>
+    <div class="quiz-q" id="qText"></div>
+    <div class="opts" id="qOpts"></div>
   </div>
+  
+  <!-- Крок 2: Лови материки (аналог "захист") -->
+  <div class="screen" id="s2">
+    <h2>🎯 КРОК 2: ВЛОВИ МАТЕРИК</h2>
+    <div class="desc">Лови назви материків і правильні географічні об'єкти, уникай хибних!</div>
+    <div class="catch-stats"><span>✅ Впіймано: <span id="catchCountDisplay">0</span>/10</span><span>❌ Пропущено: <span id="missCountDisplay">0</span></span></div>
+    <div class="catch-bar-rail"><div class="catch-bar" id="catchBar"></div></div>
+    <div class="catch-arena" id="arena"><div class="catch-basket" id="basket">🧺</div></div>
+    <div class="desc" style="font-size:11px; text-align:center;">👉 Рухай кошик або торкайся предметів</div>
+  </div>
+  
+  <!-- Крок 3: Правда/Неправда (закономірності) -->
+  <div class="screen" id="s3">
+    <h2>✅ КРОК 3: ГЕОГРАФІЧНИЙ ДИКТАНТ</h2>
+    <div class="desc">Визнач, чи є твердження правильним (ТАК) чи ні (НІ).</div>
+    <div class="sort-counter" id="sortCounter">1/8</div>
+    <div class="sort-item" id="sortItem"></div>
+    <div class="sort-buttons"><button class="sort-btn sort-yes" onclick="window.handleSort(true)">✅ ТАК</button><button class="sort-btn sort-no" onclick="window.handleSort(false)">❌ НІ</button></div>
+    <div class="pack-check" id="sortFeedback"></div>
+  </div>
+  
+  <!-- Крок 4: Класифікація островів (drag & drop) -->
+  <div class="screen" id="s4">
+    <h2>🏝️ КРОК 4: ПОХОДЖЕННЯ ОСТРОВІВ</h2>
+    <div class="desc">Перетягни острів у відповідну категорію: материковий, вулканічний або кораловий.</div>
+    <div class="pack-layout" id="packZonesContainer">
+      <div class="pack-zone" id="zoneContinental"><div class="pack-zone-label">🏔️ Материкові</div><div class="pack-items-row" id="continentalItems"></div></div>
+      <div class="pack-zone" id="zoneVolcanic"><div class="pack-zone-label">🌋 Вулканічні</div><div class="pack-items-row" id="volcanicItems"></div></div>
+      <div class="pack-zone" id="zoneCoral"><div class="pack-zone-label">🐚 Коралові</div><div class="pack-items-row" id="coralItems"></div></div>
+    </div>
+    <div class="pack-items-row" id="packShelf" style="justify-content:center; gap:8px; margin-top:8px;"></div>
+    <div class="pack-check" id="packCheck"></div>
+    <button class="btn btn-gold" id="packCheckBtn" onclick="window.checkPack()" style="display:none;">Перевірити 🧐</button>
+  </div>
+  
+  <!-- Крок 5: Шифр (секретне слово) -->
+  <div class="screen" id="s5">
+    <h2>🔐 КРОК 5: СЕКРЕТНЕ СЛОВО</h2>
+    <div class="desc">Вгадай слово, що об'єднує всі великі ділянки суходолу.</div>
+    <div class="cipher-lives" id="cipherLives">❤️❤️❤️</div>
+    <div class="cipher-display" id="cipherDisplay"></div>
+    <div class="cipher-hint" id="cipherHint">💡 Підказка: їх шість (або сім, якщо рахувати частини світу)</div>
+    <div class="cipher-keys" id="cipherKeys"></div>
+  </div>
+  
+  <!-- Фінальний екран -->
+  <div class="screen" id="sFinal">
+    <h2>🏆 КВЕСТ ПРОЙДЕНО!</h2>
+    <div class="stars-row" id="starsRow">⭐⭐⭐</div>
+    <div class="final-score" id="finalScore"></div>
+    <div class="badge">
+      <div class="badge-label">Географ-дослідник 7-Г класу</div>
+      <div class="badge-name" id="bName">Учень/учениця</div>
+      <div class="skill-box"><div class="skill-title" id="bSkill">🌍 Знавець материків</div><div class="skill-desc" id="bBonus">Відрізняє материки від частин світу</div></div>
+      <div class="badge-label">Промокод для вчителя:</div>
+      <div class="promo">GEO7-CONTINENTS</div>
+    </div>
+    <button class="btn btn-gold" id="screenshotBtn" onclick="window.saveScreenshot()">📸 Зберегти бейдж</button>
+    <div class="desc" style="text-align:center; margin-top:10px;">Покажи бейдж учителю географії! 🌟</div>
+  </div>
+</div>
 
-  <audio id="soundCoin" preload="auto">
-    <source src="https://assets.mixkit.co/sfx/download/mixkit-payout-award-1934.wav" type="audio/wav">
-  </audio>
-  <audio id="soundLevelUp" preload="auto">
-    <source src="https://assets.mixkit.co/sfx/download/mixkit-video-game-level-next-231.wav" type="audio/wav">
-  </audio>
+<script>
+'use strict';
+let xp = 0, lives = 3, totalXP = 0;
+const MAX_XP = 150;
+function addXP(n) { xp = Math.min(xp + n, MAX_XP); totalXP += n; document.getElementById('xpCount').textContent = xp; document.getElementById('xpFill').style.width = (xp/MAX_XP*100)+'%'; let pop = document.getElementById('xpPop'); pop.textContent = '+'+n+' XP'; pop.style.display='block'; pop.style.animation='none'; void pop.offsetWidth; pop.style.animation='floatUp 1.2s ease-out forwards'; setTimeout(()=>pop.style.display='none',1200); }
+function loseLife() { lives = Math.max(0, lives-1); updateLives(); window.flash('red'); if(navigator.vibrate) navigator.vibrate(60); }
+function updateLives() { document.getElementById('livesEl').textContent = ['❤️','❤️','❤️'].map((_,i)=> i<lives ? '❤️':'🖤').join(''); }
+window.flash = function(c) { let el = document.getElementById('flash'); el.className = 'result-flash '+c+' show'; setTimeout(()=>el.classList.remove('show'),300); };
+function goTo(screenId, stageIdx) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(screenId).classList.add('active','fade-in'); document.querySelectorAll('.dot').forEach((d,i)=>{ d.className = 'dot' + (i < stageIdx ? ' done' : i === stageIdx ? ' active' : ''); }); document.getElementById('stageLabel').textContent = 'Крок '+(stageIdx+1)+'/5'; }
 
-  <script>
-    let currentXP = 0;
-    let tapProgress = 0;
-    let placedItemsCount = 0;
-    
-    const soundCoin = document.getElementById('soundCoin');
-    const soundLevelUp = document.getElementById('soundLevelUp');
+// ========== КРОК 1: ВІКТОРИНА ==========
+const QUIZ = [
+  { q: 'Яке співвідношення суходолу та океану на Землі?', opts: ['30% суші / 70% океану', '29% суші / 71% океану', '40% / 60%'], correct: 1 },
+  { q: 'Скільки материків (континентів) виділяють на карті світу?', opts: ['5', '6', '7'], correct: 1 },
+  { q: 'Який материк є найбільшим за площею?', opts: ['Африка', 'Євразія', 'Північна Америка'], correct: 1 },
+  { q: 'Найбільший острів Землі — це:', opts: ['Гренландія', 'Мадагаскар', 'Нова Гвінея'], correct: 0 },
+  { q: 'Що таке "частини світу"?', opts: ['Те саме, що материки', 'Історично складені регіони, включаючи материки та острови', 'Тільки Європа й Азія'], correct: 1 }
+];
+let qIdx = 0, qTimer = null, qTimeLeft = 0;
+function initQuiz() { qIdx = 0; showQuestion(); }
+function showQuestion() { if(qIdx >= QUIZ.length) { addXP(20); goTo('s2',1); initCatch(); return; } let q = QUIZ[qIdx]; document.getElementById('qCounter').textContent = `Питання ${qIdx+1}/${QUIZ.length}`; document.getElementById('qText').textContent = q.q; let optsEl = document.getElementById('qOpts'); optsEl.innerHTML = ''; q.opts.forEach((o,i)=>{ let btn = document.createElement('button'); btn.className = 'opt'; btn.textContent = o; btn.onclick = ()=> handleQuizAnswer(i, btn); optsEl.appendChild(btn); }); startQTimer(); }
+function startQTimer() { clearInterval(qTimer); qTimeLeft = 30; updateQTimer(); qTimer = setInterval(()=>{ qTimeLeft -= 0.1; if(qTimeLeft <= 0) { clearInterval(qTimer); timeUp(); } else updateQTimer(); },100); }
+function updateQTimer() { let pct = (qTimeLeft/30)*100; let bar = document.getElementById('qTimerBar'); bar.style.width = pct+'%'; bar.className = 'quiz-timer-bar' + (pct<30 ? ' danger':''); }
+function timeUp() { loseLife(); let opts = document.querySelectorAll('#qOpts .opt'); if(opts[QUIZ[qIdx].correct]) opts[QUIZ[qIdx].correct].classList.add('correct'); setTimeout(()=>{ qIdx++; showQuestion(); },1000); }
+function handleQuizAnswer(idx, btn) { clearInterval(qTimer); document.querySelectorAll('#qOpts .opt').forEach(b=>b.style.pointerEvents='none'); let correct = QUIZ[qIdx].correct; if(idx===correct){ btn.classList.add('correct'); let bonus = Math.ceil(qTimeLeft/30*15)+10; addXP(bonus); window.flash('green'); } else { btn.classList.add('wrong'); document.querySelectorAll('#qOpts .opt')[correct].classList.add('correct'); loseLife(); } setTimeout(()=>{ qIdx++; showQuestion(); },900); }
 
-    function playSound(audioElement) {
-      if (audioElement) {
-        audioElement.currentTime = 0;
-        audioElement.play().catch(e => console.log('Аудіо очікує дії користувача'));
-      }
-    }
+// ========== КРОК 2: ЛОВИ МАТЕРИКИ ==========
+const GOOD_CATCH = ["Євразія","Африка","Пн. Америка","Пд. Америка","Австралія","Антарктида","Гренландія","Мадагаскар","Частина світу","Океанія","Суходіл 29%"];
+const BAD_CATCH = ["Пангея","Гондвана","Атлантида","Неправильний материк","Острів Марс","Фейк-океан"];
+let catchCount = 0, missCount = 0, catchItems = [], catchInterval, arenaW, arenaH, basketX = 50, catchAnimFrame, catchRunning = false;
+function initCatch() { catchCount = 0; missCount = 0; catchItems = []; document.getElementById('catchCountDisplay').textContent = '0'; document.getElementById('missCountDisplay').textContent = '0'; document.getElementById('catchBar').style.width = '0%'; let arena = document.getElementById('arena'); arenaW = arena.clientWidth; arenaH = arena.clientHeight; basketX = 50; updateBasket(); arena.addEventListener('touchmove', onArenaTouch, {passive:true}); arena.addEventListener('mousemove', onArenaMouse); catchRunning = true; clearInterval(catchInterval); catchInterval = setInterval(spawnItem, 1600); catchAnimFrame = requestAnimationFrame(catchLoop); }
+function onArenaTouch(e) { let rect = document.getElementById('arena').getBoundingClientRect(); let t = e.touches[0]; if(t) basketX = Math.min(95, Math.max(5, (t.clientX - rect.left)/arenaW*100)); updateBasket(); }
+function onArenaMouse(e) { let rect = document.getElementById('arena').getBoundingClientRect(); basketX = Math.min(95, Math.max(5, (e.clientX - rect.left)/arenaW*100)); updateBasket(); }
+function updateBasket() { document.getElementById('basket').style.left = basketX+'%'; }
+function spawnItem() { if(!catchRunning) return; let isGood = Math.random() > 0.35; let emoji = isGood ? GOOD_CATCH[Math.floor(Math.random()*GOOD_CATCH.length)] : BAD_CATCH[Math.floor(Math.random()*BAD_CATCH.length)]; let x = 5+Math.random()*90; let speed = 1.2+Math.random()*1.2; let el = document.createElement('div'); el.className = 'falling-item'; el.textContent = emoji; el.style.left = x+'%'; el.style.top = '-40px'; el.dataset.good = isGood ? '1' : '0'; el.dataset.y = -40; el.dataset.speed = speed; el.dataset.x = x; document.getElementById('arena').appendChild(el); catchItems.push(el); el.addEventListener('click',()=> tapItem(el)); el.addEventListener('touchstart',()=> tapItem(el), {passive:true}); }
+function tapItem(el) { if(!el.parentNode) return; if(el.dataset.good === '1') { catchCount++; document.getElementById('catchCountDisplay').textContent = catchCount; document.getElementById('catchBar').style.width = (catchCount/10*100)+'%'; addXP(4); window.flash('green'); if(catchCount>=10) finishCatch(); } else { loseLife(); } el.remove(); catchItems = catchItems.filter(i=>i!==el); }
+function catchLoop() { if(!catchRunning) return; let arena = document.getElementById('arena'); let basket = document.getElementById('basket'); if(!arena || !basket) return; let bRect = basket.getBoundingClientRect(); let aRect = arena.getBoundingClientRect(); let bLeft = bRect.left - aRect.left, bRight = bRect.right - aRect.left, bTop = bRect.top - aRect.top; catchItems = catchItems.filter(el=>{ if(!el.parentNode) return false; let y = parseFloat(el.dataset.y) + parseFloat(el.dataset.speed); el.dataset.y = y; el.style.top = y+'px'; let x = parseFloat(el.dataset.x)/100 * arenaW; if(y+35 >= bTop && y <= bTop+40 && x >= bLeft-12 && x <= bRight+12){ let good = el.dataset.good === '1'; if(good) { catchCount++; document.getElementById('catchCountDisplay').textContent = catchCount; document.getElementById('catchBar').style.width = (catchCount/10*100)+'%'; addXP(4); window.flash('green'); if(catchCount>=10) finishCatch(); } else loseLife(); el.remove(); return false; } if(y > arenaH+20){ if(el.dataset.good === '1'){ missCount++; document.getElementById('missCountDisplay').textContent = missCount; if(missCount>=3) { loseLife(); missCount=0; document.getElementById('missCountDisplay').textContent='0'; } } el.remove(); return false; } return true; }); catchAnimFrame = requestAnimationFrame(catchLoop); }
+function finishCatch() { catchRunning = false; clearInterval(catchInterval); cancelAnimationFrame(catchAnimFrame); catchItems.forEach(e=>e.remove()); let arena = document.getElementById('arena'); arena.removeEventListener('touchmove', onArenaTouch); arena.removeEventListener('mousemove', onArenaMouse); addXP(15); setTimeout(()=>{ goTo('s3',2); initSort(); },600); }
 
-    function updateXP(amount) {
-      currentXP += amount;
-      if (currentXP > 100) currentXP = 100;
-      
-      document.getElementById('xpCount').innerText = currentXP;
-      document.getElementById('xpBar').style.width = currentXP + '%';
-      
-      const popup = document.getElementById('xpPopup');
-      popup.innerText = `+${amount} XP`;
-      popup.style.display = 'block';
-      setTimeout(() => { popup.style.opacity = '0'; }, 800);
-      setTimeout(() => { popup.style.display = 'none'; popup.style.opacity = '1'; }, 1200);
-    }
+// ========== КРОК 3: ПРАВДА/НЕПРАВДА ==========
+const SORT_ITEMS = [
+  { text: "Найбільший материк — Євразія.", need: true, explain: "Так, Євразія займає понад 54 млн км²." },
+  { text: "Антарктида — найспекотніший материк.", need: false, explain: "Антарктида — найхолодніший материк." },
+  { text: "Вулканічні острови утворилися внаслідок вивержень вулканів.", need: true, explain: "Наприклад, Гавайські острови." },
+  { text: "Частин світу всього 5: Європа, Азія, Африка, Америка, Австралія.", need: false, explain: "Ще є Антарктида та Океанія — разом 6." },
+  { text: "Площа океанів становить близько 71% поверхні Землі.", need: true, explain: "Суходіл — 29%, океани — 71%." },
+  { text: "Австралія — найменший материк.", need: true, explain: "Його площа ~7,7 млн км²." },
+  { text: "Африка та Євразія розділені Суецьким каналом.", need: true, explain: "Штучна межа між континентами." },
+  { text: "Материкові острови ніколи не були частиною материка.", need: false, explain: "Навпаки, вони відокремились від материка." }
+];
+let sortIdx = 0, sortLocked = false;
+function initSort() { sortIdx = 0; showSortItem(); }
+function showSortItem() { if(sortIdx >= SORT_ITEMS.length) { addXP(15); goTo('s4',3); initPack(); return; } document.getElementById('sortCounter').textContent = `${sortIdx+1}/${SORT_ITEMS.length}`; document.getElementById('sortItem').textContent = SORT_ITEMS[sortIdx].text; document.getElementById('sortFeedback').textContent = ''; sortLocked = false; }
+window.handleSort = function(ans) { if(sortLocked) return; sortLocked = true; let item = SORT_ITEMS[sortIdx]; let correct = (item.need === ans); let fb = document.getElementById('sortFeedback'); if(correct) { fb.innerHTML = '✅ ' + (item.explain||'Правильно!'); fb.style.color = 'var(--green)'; addXP(5); window.flash('green'); } else { fb.innerHTML = '❌ ' + (item.explain||'Неправильно'); fb.style.color = 'var(--pink)'; loseLife(); } setTimeout(()=>{ sortIdx++; showSortItem(); }, 1000); };
 
-    // --- ЕТАП 1: ЛОГІКА КВІЗУ ---
-    function handleQuiz(isCorrect, element) {
-      if (isCorrect) {
-        element.classList.add('correct');
-        playSound(soundCoin);
-        updateXP(30);
-        
-        setTimeout(() => {
-          document.getElementById('screen1').classList.remove('active');
-          document.getElementById('screen2').classList.add('active');
-        }, 1000);
-      } else {
-        element.classList.add('wrong');
-        if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
-        setTimeout(() => element.classList.remove('wrong'), 800);
-      }
-    }
+// ========== КРОК 4: КЛАСИФІКАЦІЯ ОСТРОВІВ ==========
+const PACK_ITEMS = [
+  { text:"Гренландія", zone:"continental" }, { text:"Мадагаскар", zone:"continental" }, { text:"Великобританія", zone:"continental" },
+  { text:"Гавайські острови", zone:"volcanic" }, { text:"Ісландія", zone:"volcanic" },
+  { text:"Мальдіви", zone:"coral" }
+];
+let packPlaced = {}, dragChip = null, dragGhost = null;
+function initPack() { packPlaced = {}; document.getElementById('continentalItems').innerHTML = ''; document.getElementById('volcanicItems').innerHTML = ''; document.getElementById('coralItems').innerHTML = ''; document.getElementById('packCheck').textContent = ''; document.getElementById('packCheckBtn').style.display = 'none'; let shelf = document.getElementById('packShelf'); shelf.innerHTML = ''; PACK_ITEMS.forEach((item,i)=>{ let chip = document.createElement('div'); chip.className = 'pack-chip'; chip.textContent = item.text; chip.dataset.idx = i; chip.dataset.correct = item.zone; chip.addEventListener('touchstart', startDragTouch, {passive:true}); chip.addEventListener('mousedown', startDragMouse); shelf.appendChild(chip); }); setupDropZones(); }
+function setupDropZones() { ['zoneContinental','zoneVolcanic','zoneCoral'].forEach(id=>{ let zone = document.getElementById(id); if(zone){ zone.addEventListener('touchend', dropTouch); zone.addEventListener('mouseup', dropMouse); zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('highlight'); }); zone.addEventListener('dragleave', ()=> zone.classList.remove('highlight')); } }); }
+function startDragTouch(e) { dragChip = e.currentTarget; let t = e.touches[0]; createGhost(dragChip, t.clientX, t.clientY); document.addEventListener('touchmove', moveDragTouch, {passive:true}); document.addEventListener('touchend', endDragTouch, {once:true}); }
+function moveDragTouch(e) { let t = e.touches[0]; moveGhost(t.clientX, t.clientY); highlightZone(t.clientX, t.clientY); }
+function endDragTouch(e) { let t = e.changedTouches[0]; document.removeEventListener('touchmove', moveDragTouch); dropAtPoint(t.clientX, t.clientY); removeGhost(); }
+function startDragMouse(e) { dragChip = e.currentTarget; createGhost(dragChip, e.clientX, e.clientY); document.addEventListener('mousemove', moveDragMouse); document.addEventListener('mouseup', endDragMouse, {once:true}); }
+function moveDragMouse(e) { moveGhost(e.clientX, e.clientY); highlightZone(e.clientX, e.clientY); }
+function endDragMouse(e) { document.removeEventListener('mousemove', moveDragMouse); dropAtPoint(e.clientX, e.clientY); removeGhost(); }
+function createGhost(chip, x, y) { dragGhost = chip.cloneNode(true); dragGhost.style.cssText = `position:fixed;left:${x-40}px;top:${y-20}px;z-index:500;opacity:.85;pointer-events:none;`; document.body.appendChild(dragGhost); chip.style.opacity = '0.35'; }
+function moveGhost(x,y) { if(dragGhost){ dragGhost.style.left=(x-40)+'px'; dragGhost.style.top=(y-20)+'px'; } }
+function removeGhost() { if(dragGhost){ dragGhost.remove(); dragGhost=null; } if(dragChip) dragChip.style.opacity='1'; }
+function highlightZone(x,y) { ['zoneContinental','zoneVolcanic','zoneCoral'].forEach(id=>{ let el = document.getElementById(id); if(!el) return; let r = el.getBoundingClientRect(); let over = (x>=r.left && x<=r.right && y>=r.top && y<=r.bottom); if(over) el.classList.add('highlight'); else el.classList.remove('highlight'); }); }
+function dropAtPoint(x,y) { let zoneMap = { zoneContinental:'continental', zoneVolcanic:'volcanic', zoneCoral:'coral' }; for(let [id, zone] of Object.entries(zoneMap)){ let el = document.getElementById(id); if(!el) continue; el.classList.remove('highlight'); let r = el.getBoundingClientRect(); if(x>=r.left && x<=r.right && y>=r.top && y<=r.bottom){ placeChip(zone); break; } } }
+function dropTouch(e){} function dropMouse(e){}
+function placeChip(zone) { if(!dragChip) return; let idx = dragChip.dataset.idx; if(packPlaced[idx] !== undefined) return; packPlaced[idx] = zone; dragChip.style.opacity = '1'; let targetId = { continental:'continentalItems', volcanic:'volcanicItems', coral:'coralItems' }[zone]; let target = document.getElementById(targetId); if(target){ let clone = document.createElement('div'); clone.className = 'pack-chip'; clone.textContent = dragChip.textContent; target.appendChild(clone); } dragChip.style.display = 'none'; dragChip = null; if(Object.keys(packPlaced).length >= PACK_ITEMS.length) document.getElementById('packCheckBtn').style.display = 'block'; }
+window.checkPack = function() { let correct = 0; PACK_ITEMS.forEach((item,i)=>{ if(packPlaced[i] === item.zone) correct++; }); let fb = document.getElementById('packCheck'); if(correct === PACK_ITEMS.length){ fb.innerHTML = '🎉 Чудово! Всі острови розподілено правильно!'; fb.style.color = 'var(--green)'; addXP(25); window.flash('green'); setTimeout(()=>{ goTo('s5',4); initCipher(); },1000); } else { fb.innerHTML = `⚠️ ${correct}/${PACK_ITEMS.length} правильно. Спробуйте ще раз!`; fb.style.color = 'var(--pink)'; loseLife(); setTimeout(resetPack, 1200); } };
+function resetPack() { packPlaced = {}; document.getElementById('continentalItems').innerHTML = ''; document.getElementById('volcanicItems').innerHTML = ''; document.getElementById('coralItems').innerHTML = ''; document.getElementById('packCheck').textContent = ''; document.getElementById('packCheckBtn').style.display = 'none'; document.querySelectorAll('#packShelf .pack-chip').forEach(c=>{ c.style.display = ''; c.style.opacity = '1'; }); }
 
-    // --- ЕТАП 2: ЛОГІКА ТАПАЛКИ ---
-    function handleTap() {
-      if (tapProgress >= 100) return;
-      
-      tapProgress += 8;
-      if (tapProgress > 100) tapProgress = 100;
-      
-      document.getElementById('miniBar').style.width = tapProgress + '%';
-      if (navigator.vibrate) navigator.vibrate(20);
+// ========== КРОК 5: ШИФР (слово МАТЕРИКИ) ==========
+const CIPHER_WORD = "МАТЕРИКИ";
+const CIPHER_HINT = "Їх шість: Євразія, Африка, Пн. Америка, Пд. Америка, Австралія, Антарктида";
+let cGuessed = [], cWrong = 0, C_MAX_WRONG = 3;
+function initCipher() { cGuessed = []; cWrong = 0; renderCipher(); buildKeys(); }
+function renderCipher() { let disp = CIPHER_WORD.split('').map(l=> cGuessed.includes(l) ? l : '_').join(' '); document.getElementById('cipherDisplay').textContent = disp; let done = CIPHER_WORD.split('').filter(l=> cGuessed.includes(l)).length; document.getElementById('cipherProg').innerHTML = `Відкрито: ${done}/${CIPHER_WORD.length}`; let hearts = Array(C_MAX_WRONG).fill(0).map((_,i)=> i < (C_MAX_WRONG - cWrong) ? '❤️':'🖤').join(''); document.getElementById('cipherLives').innerHTML = hearts; document.getElementById('cipherHint').innerHTML = '💡 ' + CIPHER_HINT; }
+function buildKeys() { let letters = "АБВГДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ"; let container = document.getElementById('cipherKeys'); container.innerHTML = ''; for(let l of letters){ let btn = document.createElement('button'); btn.className = 'cipher-key'; btn.textContent = l; btn.onclick = ()=> guessLetter(l, btn); container.appendChild(btn); } }
+function guessLetter(letter, btn) { if(cGuessed.includes(letter)) return; cGuessed.push(letter); btn.classList.add('used'); if(CIPHER_WORD.includes(letter)){ btn.classList.add('correct'); addXP(5); window.flash('green'); if(CIPHER_WORD.split('').every(l=> cGuessed.includes(l))){ addXP(20); setTimeout(finishGame, 700); return; } } else { btn.classList.add('wrong'); cWrong++; loseLife(); if(cWrong >= C_MAX_WRONG){ cGuessed.push(...CIPHER_WORD.split('')); renderCipher(); setTimeout(finishGame, 1000); return; } } renderCipher(); }
 
-      if (tapProgress >= 100) {
-        playSound(soundCoin);
-        updateXP(30);
-        
-        setTimeout(() => {
-          document.getElementById('screen2').classList.remove('active');
-          document.getElementById('screen3').classList.add('active');
-          initDragAndDrop();
-        }, 1000);
-      }
-    }
+// ========== ФІНАЛ ==========
+function finishGame() { let name = localStorage.getItem('geo_student') || 'Географ-початківець'; let skill = '🌐 Картографічна грамотність'; let bonus = 'Відрізняє материки від частин світу, знає походження островів'; document.getElementById('bName').textContent = name; document.getElementById('bSkill').textContent = skill; document.getElementById('bBonus').textContent = bonus; let stars = ['⭐','⭐⭐','⭐⭐⭐'][Math.min(2, Math.max(0, lives))]; document.getElementById('starsRow').textContent = stars; document.getElementById('finalScore').innerHTML = `Набрано XP: ${xp} · Життів: ${lives} · ${stars}`; goTo('sFinal',5); if(typeof confetti === 'function') confetti({particleCount:150, spread:70, origin:{y:0.6}}); }
+window.saveScreenshot = function() { let btn = document.getElementById('screenshotBtn'); let badge = document.querySelector('.badge'); if(!badge) return; btn.textContent = '⏳...'; btn.style.pointerEvents = 'none'; html2canvas(badge, {scale:2}).then(canvas=>{ let link = document.createElement('a'); link.download = 'geo_badge_7g.png'; link.href = canvas.toDataURL(); link.click(); btn.textContent = '📸 Збережено!'; setTimeout(()=>btn.textContent = '📸 Зберегти бейдж', 2000); btn.style.pointerEvents = ''; }).catch(()=>{ alert('Зробіть скріншот вручну'); btn.textContent = '📸 Зберегти бейдж'; btn.style.pointerEvents = ''; }); };
 
-    // --- ЕТАП 3: ТЕТРІС-РЮКЗАК ---
-    function initDragAndDrop() {
-      const dragItems = document.querySelectorAll('.drag-item');
-      const gridCells = document.querySelectorAll('.grid-cell');
-      let draggedItem = null;
-
-      dragItems.forEach(item => {
-        item.addEventListener('dragstart', function() {
-          draggedItem = this;
-        });
-      });
-
-      gridCells.forEach(cell => {
-        cell.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('highlight'); });
-        cell.addEventListener('dragleave', function() { this.classList.remove('highlight'); });
-        cell.addEventListener('drop', function() {
-          this.classList.remove('highlight');
-          if (draggedItem && !this.hasAttribute('data-filled')) {
-            placeItemInGrid(this, draggedItem);
-            draggedItem = null;
-          }
-        });
-      });
-
-      dragItems.forEach(item => {
-        item.addEventListener('touchstart', function(e) {
-          draggedItem = this;
-        }, {passive: true});
-
-        item.addEventListener('touchmove', function(e) {
-          if (!draggedItem) return;
-          const touch = e.touches[0];
-          draggedItem.style.position = 'fixed';
-          draggedItem.style.left = (touch.clientX - 50) + 'px';
-          draggedItem.style.top = (touch.clientY - 20) + 'px';
-          draggedItem.style.zIndex = '1000';
-        }, {passive: true});
-
-        item.addEventListener('touchend', function(e) {
-          if (!draggedItem) return;
-          
-          const touch = e.changedTouches[0];
-          draggedItem.style.display = 'none';
-          const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-          
-          draggedItem.style.position = 'static';
-          draggedItem.style.zIndex = 'auto';
-          draggedItem.style.display = 'block';
-          
-          const targetCell = elementUnderTouch ? elementUnderTouch.closest('.grid-cell') : null;
-
-          if (targetCell && !targetCell.hasAttribute('data-filled')) {
-            placeItemInGrid(targetCell, draggedItem);
-          }
-          draggedItem = null;
-        });
-      });
-    }
-
-    function placeItemInGrid(cell, item) {
-      cell.setAttribute('data-filled', 'true');
-      cell.style.background = 'var(--gold-yellow)';
-      cell.style.border = '2px solid white';
-      cell.innerText = item.innerText.split(' ')[0];
-      
-      item.classList.add('placed');
-      placedItemsCount++;
-      
-      if (navigator.vibrate) navigator.vibrate(40);
-
-      if (placedItemsCount >= 2) {
-        updateXP(40);
-        setTimeout(finishGame, 800);
-      }
-    }
-
-    // --- ФІНАЛ: НАДСИЛАННЯ В ТАБЛИЦЮ, БЕЙДЖ ТА САЛЮТ ---
-    function finishGame() {
-      document.getElementById('screen3').classList.remove('active');
-      document.getElementById('screenFinal').classList.add('active');
-      
-      playSound(soundLevelUp);
-      
-      const studentName = localStorage.getItem('pysanka_student_name') || 'Супер-Учень';
-      const studentSkill = localStorage.getItem('pysanka_student_skill') || '🦾 Мега-мозок математики';
-      const studentBonus = localStorage.getItem('pysanka_student_bonus') || 'Швидкість розв’язування задач x2!';
-      
-      document.getElementById('badgeName').innerText = studentName;
-      document.getElementById('badgeSkill').innerText = studentSkill;
-      document.getElementById('badgeBonus').innerText = studentBonus;
-
-      // 🌟 ВСТАВЛЕНЕ ВАШЕ ПОСИЛАННЯ НА GOOGLE APPS SCRIPT 🌟
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqqDgBlAER2cHA-wLm2IVqPmdvTcENYZ9wvKODyc77kgFbvPw7bbY510sPsPEApueZ/exec";
-
-      const playerData = {
-        name: studentName,
-        skill: studentSkill,
-        bonus: studentBonus,
-        key: "Pysanka5ClassKey2026" // Секретний ключ захисту
-      };
-
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(playerData)
-      })
-      .then(() => console.log("Дані захищено та успішно надіслані!"))
-      .catch(err => console.error("Помилка відправки даних:", err));
-
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      }
-    }
-  </script>
+// Запит імені при старті
+window.addEventListener('load', ()=>{
+  let saved = localStorage.getItem('geo_student');
+  if(!saved) { let n = prompt("Вітаю! Як тебе звати? (для іменного бейджа)","Учень/учениця"); if(n) localStorage.setItem('geo_student', n); else localStorage.setItem('geo_student', 'Географ-початківець'); }
+  initQuiz();
+});
+</script>
 </body>
 </html>
