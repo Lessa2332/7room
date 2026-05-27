@@ -307,7 +307,7 @@ function checkFinalWord() {
   }
 }
 
-// ========== ФІНАЛ (з відправкою в Google Таблицю) ==========
+// ========== ФІНАЛ (виправлена відправка в Google Таблицю) ==========
 let dataSent = false;
 function finishGame() {
   let studentName = localStorage.getItem('pysanka_student_name') || 
@@ -332,9 +332,10 @@ function finishGame() {
   if (!dataSent) {
     dataSent = true;
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUQDH4R8hyxjzW_tySEyj4vbCkd4nq_6NPChEq-9onPvWgatk5ryENhv75N3h9bgn9aA/exec";
+    
+    // Основний запит без no-cors – отримуємо відповідь
     fetch(WEB_APP_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: studentName,
@@ -342,7 +343,29 @@ function finishGame() {
         bonus: studentBonus,
         key: 'Pysanka5ClassKey2026'
       })
-    }).catch(err => console.log('Помилка відправки в таблицю:', err));
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('✅ Google Apps Script відповів:', data);
+      if (data.status !== 'success') {
+        console.warn('Помилка таблиці:', data.message);
+      }
+    })
+    .catch(err => {
+      console.error('❌ Помилка відправки (CORS або мережа):', err);
+      // Резервний no-cors запит (не побачимо відповідь, але надішлемо)
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: studentName,
+          skill: studentSkill,
+          bonus: studentBonus,
+          key: 'Pysanka5ClassKey2026'
+        })
+      }).catch(e => console.log('Навіть no-cors не спрацював:', e));
+    });
   }
 }
 
