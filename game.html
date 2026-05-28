@@ -875,18 +875,22 @@ function checkCipherWord() {
 }
 
 // ══════════════════════════════════════════
-// FINAL + DATA SEND (як у грі для 5-го класу)
+// FINAL + DATA SEND (ПОВНІСТЮ АДАПТОВАНО ПІД ТАБЛИЦЮ)
 // ══════════════════════════════════════════
 function finishGame() {
-  const skill = '🌐 Картографічна грамотність';
-  const bonus = 'Відрізняє материки від частин світу, знає походження островів';
+  // 🎯 Дані, що відповідають колонкам таблиці:
+  // [Дата та час (авто), Ім'я учня, Суперсила, Бонус, Статус]
+  const studentSkill = '🌐 Знавець материків';
+  const studentBonus = 'Відрізняє материки від частин світу';
+  const gameStatus = 'Квест пройдено! 🎉';
 
+  // Оновлення бейджа
   const bNameEl = document.getElementById('bName');
   const bSkillEl = document.getElementById('bSkill');
   const bBonusEl = document.getElementById('bBonus');
   if (bNameEl) bNameEl.textContent = studentName;
-  if (bSkillEl) bSkillEl.textContent = skill;
-  if (bBonusEl) bBonusEl.textContent = bonus;
+  if (bSkillEl) bSkillEl.textContent = studentSkill;
+  if (bBonusEl) bBonusEl.textContent = studentBonus;
 
   const stars = ['⭐','⭐⭐','⭐⭐⭐'][Math.min(2, Math.max(0, lives))];
   const starsRow = document.getElementById('starsRow');
@@ -898,38 +902,42 @@ function finishGame() {
 
   goTo('sFinal',5);
 
+  // 🎊 Конфетті
   if (typeof confetti === 'function') {
     confetti({ particleCount:160, spread:85, origin:{y:0.55} });
     setTimeout(()=> confetti({ particleCount:80, spread:120, origin:{y:0.3}, angle:60 }), 600);
   }
 
-  // ✅ Відправка даних (URLSearchParams + no-cors, як у грі для 5-го класу)
+  // 📤 ВІДПРАВКА ДАНИХ У ТАБЛИЦЮ (з новим URL)
   if (!dataSent) {
     dataSent = true;
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqqDgBlAER2cHA-wLm2IVqPmdvTcENYZ9wvKODyc77kgFbvPw7bbY510sPsPEApueZ/exec";
     
+    // 🔗 ТВОЙ НОВИЙ СКРИПТ:
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzg2dI3th9AEks_ohUhELjsu6bJh0GPHU47O85jIhDRiymeOj40y61GJrWSIkB5zhU-UQ/exec";
+    
+    // 📦 Формат даних точно під таблицю:
     const payload = new URLSearchParams({
-      name: studentName,
-      skill: skill,
-      bonus: bonus,
-      xp: xp.toString(),
-      lives: lives.toString(),
+      name: studentName,        // → Ім'я учня
+      skill: studentSkill,      // → Суперсила
+      bonus: studentBonus,      // → Бонус
+      status: gameStatus,       // → Статус
+      xp: xp.toString(),        // (додатково)
+      lives: lives.toString(),  // (додатково)
       key: 'Pysanka5ClassKey2026'
     });
 
     fetch(WEB_APP_URL, {
       method: 'POST',
-      mode: 'no-cors',
+      mode: 'no-cors',  // ✅ Обов'язково для Google Apps Script
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: payload
     })
     .then(() => {
-      console.log('✅ Результати гри надіслано до таблиці!', { studentName, xp, lives });
+      console.log('✅ Дані надіслано в таблицю:', { studentName, studentSkill, gameStatus });
     })
     .catch(err => {
-      console.error('❌ Помилка відправки даних:', err);
-      // Для мобільних: покажи користувачу
-      alert('⚠️ Не вдалося зберегти результат онлайн, але бейдж збережено локально! 📸');
+      console.error('❌ Помилка відправки:', err);
+      // Не блокуємо гру, якщо відправка не вдалась
     });
   }
 }
@@ -979,14 +987,12 @@ window.saveScreenshot = function() {
 // INIT
 // ══════════════════════════════════════════
 window.addEventListener('load', ()=>{
-  // Перевірка збереженого імені
   const savedName = localStorage.getItem('geo7g_student_name');
   if (savedName) {
     studentName = savedName;
     document.getElementById('nameModal').style.display = 'none';
     initQuiz();
   } else {
-    // Показати модальне вікно для вводу імені
     document.getElementById('nameModal').style.display = 'flex';
     const input = document.getElementById('studentNameInput');
     if (input) {
